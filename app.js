@@ -15,5 +15,6 @@ db.on('error',console.error.bind(console, 'connection error:'));
 app.get('/', function(req, res){
     res.send('hello world');
   });
-
+// just checking the commit
+//////////////////////////////////////////////////
 app.listen(3000);

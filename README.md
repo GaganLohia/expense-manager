@@ -1,2 +1,2 @@
-# expense-manager
-# First Project in Node js
+# Rest Api For Expense-manager
+# Built in NodeJS

@@ -7,7 +7,8 @@ var app         = require('express')(),
     config      = require(path.resolve( __dirname, "./config.js" )),
     models      = require(path.resolve(__dirname,"./models/user.js")),
     port        = process.env.PORT || 3000,
-    user        = models.User;
+    user        = models.User,
+    transaction = models.Transaction;
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -91,23 +92,34 @@ app.post('/signin',function(req,res){
         }
      })
 });
-function isTokenValid(token){
-    var flag = false;
-    jwt.verify(token, config.secretKey, function(err, decoded) {
-        if(err==null){
-            flag = true;
-        }
-    });
-    return flag;
-}
+
 app.post('/addNewTransaction',(req,res) =>{
-    var token = req.headers.token;
+    var token             = req.headers.token;
+    var userId            = req.headers.userId;
+    var transactionName   = req.body.transactionName;
+    var transactionValue  = req.body.transactionValue;
+    var transactionType   = req.body.transactionType;
     if(token){
         console.log(isTokenValid(token));
         if(isTokenValid(token)){
-            res.json({
-                success : true,
-                msg     : 'Transaction added successfully.'
+            var newTrans = new transaction({
+                transactionName: transactionName,
+                transactionValue: transactionValue,
+                transactionType: transactionType,
+                userId : {userId}
+            });
+            newTrans.save(function(err){
+                if(err){
+                    res.json({
+                        success : false,
+                        msg     : 'Transaction not added!'
+                    });
+                } else {
+                    res.json({
+                        success : true,
+                        msg     : 'Transaction added successfully.'
+                    });
+                }
             });
         } else{
             res.json({
@@ -127,3 +139,12 @@ app.listen(port,()=>{
     console.log('Listening to Port ' + port);
 });
 
+function isTokenValid(token){
+    var flag = false;
+    jwt.verify(token, config.secretKey, function(err, decoded) {
+        if(err==null){
+            flag = true;
+        }
+    });
+    return flag;
+}

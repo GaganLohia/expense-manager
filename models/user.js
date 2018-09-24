@@ -5,7 +5,7 @@ var transaction = new Schema({
         transactionName: String,
         transactionValue: {type: String, required: false},
         transactionType: {type: String, required: false},
-        user : {type : mongoose.Schema.Types.ObjectId, ref : 'User'}
+        userId : {type : mongoose.Schema.Types.ObjectId, ref : 'User'}
 });
 var userSchema = new Schema({ 
     username: { type: String, required: true, unique: true }, 

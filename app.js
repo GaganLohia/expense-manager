@@ -95,7 +95,7 @@ app.post('/signin',function(req,res){
 
 app.post('/addNewTransaction',(req,res) =>{
     var token             = req.headers.token;
-    var userId            = req.headers.userId;
+    var userId            = req.headers.userid;
     var transactionName   = req.body.transactionName;
     var transactionValue  = req.body.transactionValue;
     var transactionType   = req.body.transactionType;
@@ -106,7 +106,7 @@ app.post('/addNewTransaction',(req,res) =>{
                 transactionName: transactionName,
                 transactionValue: transactionValue,
                 transactionType: transactionType,
-                userId : {userId}
+                userId : mongoose.Types.ObjectId(userId)
             });
             newTrans.save(function(err){
                 if(err){
@@ -134,6 +134,19 @@ app.post('/addNewTransaction',(req,res) =>{
         });
     }
 });
+
+app.get('/getAllTransactions',function(req,res){
+    var userId = req.headers.userid;
+
+    console.log(mongoose.Types.ObjectId(userId));
+    transaction.find({
+        userId : userId
+    },function(err,transactions){
+        console.log(transactions);
+        res.json(transactions);
+    });
+});
+
 
 app.listen(port,()=>{
     console.log('Listening to Port ' + port);

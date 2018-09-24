@@ -5,14 +5,15 @@ var app         = require('express')(),
     bodyParser  = require('body-parser'),
     morgan      = require('morgan'),
     config      = require(path.resolve( __dirname, "./config.js" )),
-    user        = require(path.resolve(__dirname,"./models/user.js")),
-    port        = process.env.PORT || 3000;
+    models      = require(path.resolve(__dirname,"./models/user.js")),
+    port        = process.env.PORT || 3000,
+    user        = models.User;
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
-mongoose.connect(config.dbUrl);
+mongoose.connect(config.dbUrl,{ useNewUrlParser: true } );
 var db = mongoose.connection;
 
 
@@ -36,7 +37,17 @@ app.post('/signup',function(req,res){
     });
     newUser.save(function(err){
         if(err){
-            throw err;
+            if(err.name=='ValidationError'){
+                res.json({
+                    success : false,
+                    msg     : 'User Already Exists!',
+                });
+            } else {
+                res.json({
+                    success : false,
+                    msg     : 'Please try again later.',
+                });
+            }
         } else{
             res.json({
                 success : true,
@@ -52,6 +63,7 @@ app.post('/signin',function(req,res){
         username : userName
      },function(err,userObj){
         if(userObj){
+            console.log(JSON.stringify(userObj));
             if(userObj.password != password){
                 res.json({
                     success : false,
@@ -61,9 +73,12 @@ app.post('/signin',function(req,res){
                 const payload = {
                     username : userName
                 };
-                var token = jwt.sign(payload,config.secretKey);
+                var token = jwt.sign(payload,config.secretKey, {
+                    expiresIn : 24*60*60
+                  });
                 res.json({
                     success : true,
+                    id      : userObj._id,
                     msg     : 'SignIn Successful',
                     token   : token
                 });
@@ -76,6 +91,39 @@ app.post('/signin',function(req,res){
         }
      })
 });
+function isTokenValid(token){
+    var flag = false;
+    jwt.verify(token, config.secretKey, function(err, decoded) {
+        if(err==null){
+            flag = true;
+        }
+    });
+    return flag;
+}
+app.post('/addNewTransaction',(req,res) =>{
+    var token = req.headers.token;
+    if(token){
+        console.log(isTokenValid(token));
+        if(isTokenValid(token)){
+            res.json({
+                success : true,
+                msg     : 'Transaction added successfully.'
+            });
+        } else{
+            res.json({
+                success : false,
+                msg     : 'Session Expired!'
+            });
+        }
+    } else {
+        res.json({
+            success : false,
+            msg     : 'Token not Provided'
+        });
+    }
+});
+
 app.listen(port,()=>{
     console.log('Listening to Port ' + port);
 });
+

@@ -147,6 +147,24 @@ app.get('/getAllTransactions',function(req,res){
     });
 });
 
+app.get('/updateTransaction',function(req,res){
+    var transactionId = req.headers.transactionid;
+    transaction.update({_id : transactionId} , 
+        { $set : { transactionName : "Harshit" } },
+        function(err,obj){
+        if(err){
+            console.log("Error in updating"+err);
+        }
+        else{
+            res.json({
+                success : true,
+                msg     : 'Transaction updated successfully.'
+            });
+        }
+    })
+    
+});
+
 
 app.listen(port,()=>{
     console.log('Listening to Port ' + port);

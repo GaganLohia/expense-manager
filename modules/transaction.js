@@ -50,11 +50,9 @@ var addNewTransaction = function(req,res){
 
 var getAllTransactions = function(req,res){
     var userId            = req.headers.userid;
-    console.log(mongoose.Types.ObjectId(userId));
     Transaction.find({
         userId : userId
     },function(err,transactions){
-        console.log(transactions);
         res.json(transactions);
     });
 };
@@ -77,7 +75,10 @@ var updateTransaction = function(req,res){
         },
         function(err,obj){
         if(err){
-            console.log("Error in updating"+err);
+            res.json({
+                success : false,
+                msg     : 'Transaction not updated!'
+            });
         }
         else{
             res.json({

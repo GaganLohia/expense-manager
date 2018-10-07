@@ -2,6 +2,7 @@ var path        = require('path'),
     jwt         = require('jsonwebtoken'),
     models      = require(path.resolve(__dirname,"../models/schema.js")),
     config      = require(path.resolve( __dirname, "../config.js" )),
+    utils       = require(path.resolve(__dirname, "./utilities")),
     User        = models.User;
 var signIn = function(req, res){
     var userName = req.body.username;
@@ -12,10 +13,7 @@ var signIn = function(req, res){
         if(userObj){
             console.log(JSON.stringify(userObj));
             if(userObj.password != password){
-                res.json({
-                    success : false,
-                    msg     : 'Wrong Password'
-                });
+                utils.sendResponse(res, 401, false, 'Wrong Password');
             } else{
                 const payload = {
                     username : userName
@@ -23,18 +21,14 @@ var signIn = function(req, res){
                 var token = jwt.sign(payload,config.secretKey, {
                     expiresIn : 24*60*60
                   });
-                res.json({
-                    success : true,
+                var params = {
                     id      : userObj._id,
-                    msg     : 'SignIn Successful',
                     token   : token
-                });
+                }
+                utils.sendResponse(res, 200, true, 'SignIn Successful',params);
             }
         } else{
-            res.json({
-                success : false,
-                msg     : 'User Not Found'
-            });
+            utils.sendResponse(res, 404, false, 'User Not Found');
         }
      })
 }
@@ -48,21 +42,12 @@ var signUp = function(req,res){
     newUser.save(function(err){
         if(err){
             if(err.name=='ValidationError'){
-                res.json({
-                    success : false,
-                    msg     : 'User Already Exists!',
-                });
+                utils.sendResponse(res, 409, false, 'User Already Exists!');
             } else {
-                res.json({
-                    success : false,
-                    msg     : 'Please try again later.',
-                });
+                utils.sendResponse(res, 500, false, 'Please try again later.');
             }
         } else{
-            res.json({
-                success : true,
-                msg     : 'SignUp Successful',
-            });
+            utils.sendResponse(res, 200, true, 'SignUp Successful');
         }
     });
 }

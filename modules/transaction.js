@@ -19,15 +19,10 @@ var addNewTransaction = function (req, res) {
     });
     newTrans.save(function (err) {
         if (err) {
-            res.json({
-                success: false,
-                msg: 'Transaction not added!'
-            });
+            console.log(err);
+            utils.sendResponse(res, 500, false, 'Please try again later.');
         } else {
-            res.json({
-                success: true,
-                msg: 'Transaction added successfully.'
-            });
+            utils.sendResponse(res, 200, true, 'Transaction added successfully.');
         }
     });
 };
@@ -37,13 +32,19 @@ var getAllTransactions = function (req, res) {
     Transaction.find({
         userId: userId
     }, function (err, transactions) {
-        res.json(transactions);
+        if (err) {
+            utils.sendResponse(res, 500, false, 'Please try again later.');
+        } else {
+            var params = {
+                transactions: transactions
+            };
+            utils.sendResponse(res, 200, true, '', params);
+        }
     });
 };
 
 var updateTransaction = function (req, res) {
     var transactionId = req.headers.transactionid;
-    var token = req.headers.token;
     var userId = req.headers.userid;
     var transactionName = req.body.transactionName;
     var transactionValue = req.body.transactionValue;
@@ -60,16 +61,10 @@ var updateTransaction = function (req, res) {
     },
         function (err, obj) {
             if (err) {
-                res.json({
-                    success: false,
-                    msg: 'Transaction not updated!'
-                });
+                utils.sendResponse(res, 500, false, 'Please try again later.');
             }
             else {
-                res.json({
-                    success: true,
-                    msg: 'Transaction updated successfully.'
-                });
+                utils.sendResponse(res, 200, true, 'Transaction updated successfully.');
             }
         })
 

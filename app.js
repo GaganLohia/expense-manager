@@ -22,7 +22,7 @@ app.get('/', ()=>{
     res.send('This is Api End-point for Expense Manager');
 });
 app.use('/*',(req,res)=>{
-    utils.sendResponse(res, 400, false, 'Bad Request!');
+    utils.sendResponse(res, 404, false, 'Not Found');
 })
 app.listen(port,()=>{
     console.log('Listening to Port ' + port);

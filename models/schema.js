@@ -5,13 +5,12 @@ var transaction = new Schema({
     transactionName     : {type: String, required: true},
     transactionValue    : {type: String, required: true},
     transactionType     : {type: String, required: true},
-    transactionDate     : {type: String, required: true},
+    transactionDate     : {type: Date, default:Date.now()},
     userId              : {type : mongoose.Schema.Types.ObjectId, ref : 'User'}
 });
 var userSchema = new Schema({ 
     username                : { type: String, required: true, unique: true }, 
-    password                : { type: String, required: true },
-    transactions            : [{type : mongoose.Schema.Types.ObjectId, ref : 'Transaction'}],
+    password                : { type: String, required: true }
 });
 userSchema.plugin(uniqueValidator);
 module.exports = {

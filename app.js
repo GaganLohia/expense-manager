@@ -18,7 +18,8 @@ app.post('/signin',Authenticate.signIn);
 app.post('/addNewTransaction',utils.isTokenValid,Transactions.addNewTransaction);
 app.get('/getAllTransactions',utils.isTokenValid,Transactions.getAllTransactions);
 app.post('/updateTransaction',utils.isTokenValid,Transactions.updateTransaction);
-app.get('/', ()=>{
+app.delete('/deleteTransaction',utils.isTokenValid,Transactions.deleteTransaction);
+app.get('/', (req,res)=>{
     res.send('This is Api End-point for Expense Manager');
 });
 app.use('/*',(req,res)=>{
